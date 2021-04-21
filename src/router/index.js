@@ -28,23 +28,23 @@ const router = new VueRouter({
 			component: home,
 			redirect: '/welcome',
 			children: [{
-					path: '/welcome',
-					component: welcome
-				},
-				{
-					path: '/goodslist',
-					component: goods
-				}
+				path: '/welcome',
+				component: welcome
+			},
+			{
+				path: '/goodslist',
+				component: goods
+			}
 			]
 		}
 	]
 })
 
-//挂载路由导航守卫
-router.beforeEach((to, from, next) => {
-	if(to.path === '/login') return next();
-	const tokenStr = window.sessionStorage.getItem('token')
-	if(!tokenStr) return next('/login')
-	next()
-})
+// //挂载路由导航守卫
+// router.beforeEach((to, from, next) => {
+// 	if(to.path === '/login') return next();
+// 	const tokenStr = window.sessionStorage.getItem('token')
+// 	if(!tokenStr) return next('/login')
+// 	next()
+// })
 export default router

@@ -9,9 +9,11 @@ import './assets/css/global.css'
 
 import axios from 'axios'
 
-axios.defaults.baseURL = 'http://10.200.26.75:8888'
+axios.defaults.baseURL = '/'
 
 Vue.prototype.$http = axios
+Vue.prototype.$axios = axios
+
 
 Vue.config.productionTip = false
 
