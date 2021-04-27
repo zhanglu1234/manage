@@ -3,9 +3,9 @@
 		<!--面包屑导航-->
 		<el-breadcrumb separator-class="el-icon-arrow-left">
 			<el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
-			<el-breadcrumb-item :to="{ path: '/goodslist' }">申请列表</a>
+			<el-breadcrumb-item :to="{ path: '/applyInfo' }">申请列表</a>
 			</el-breadcrumb-item>
-			<el-breadcrumb-item>商品列表</el-breadcrumb-item>
+		
 		</el-breadcrumb>
 
 		<!--卡片视图区-->
@@ -42,7 +42,7 @@
 				<el-table-column label="车型" prop="drivercartype"></el-table-column>
 				<el-table-column label="车牌号" prop="drivercarnumber"></el-table-column>
 				<el-table-column label="申请来源" prop="driverinfosource"></el-table-column>
-				<el-table-column label="申请日期" prop="applytime"></el-table-column>
+				<el-table-column label="预约日期" prop="applytime"></el-table-column>
 				<el-table-column label="操作">
 					<!--slot-scope作用域插槽拿到scope对象-->
 					<template slot-scope="scope">
@@ -302,7 +302,12 @@ export default {
   methods: {
     async getgoodslist() {
       await this.$http
-        .post("/applyInfo/AllDriverInfoByManage", this.queryInfo)
+        .post("/applyInfo/AllDriverInfoByManage", this.queryInfo, {
+          headers: {
+            "Content-Type": "application/json",
+            token: localStorage.getItem("token"),
+          },
+        })
         .then((Response) => {
           console.log(this.queryInfo);
           console.log("获取数据");
@@ -348,7 +353,13 @@ export default {
         //返回为true则向浏览器发送真正的添加商品的请求
         const { data: res } = await this.$http.post(
           "/applyInfo/insertInfo",
-          this.addForm
+          this.addForm,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              token: localStorage.getItem("token"),
+            },
+          }
         );
         if (res.code != 200) {
           this.$message.error("添加商品失败！");
@@ -364,7 +375,12 @@ export default {
       console.log("获取用户id");
       console.log(driverinfoid);
       await this.$http
-        .get("/applyInfo/infoByDriverInfoId/?driverInfoId=" + driverinfoid)
+        .get("/applyInfo/infoByDriverInfoId/?driverInfoId=" + driverinfoid, {
+          headers: {
+            "Content-Type": "application/json",
+            token: localStorage.getItem("token"),
+          },
+        })
         .then((Response) => {
           const res = Response.data;
           if (res.code != 200) {
@@ -392,7 +408,12 @@ export default {
         if (!valid) return;
         //否则发起数据修改请求
         await this.$http
-          .patch("/applyInfo/updateDriverApplyInfo", this.editForm)
+          .patch("/applyInfo/updateDriverApplyInfo", this.editForm, {
+            headers: {
+              "Content-Type": "application/json",
+              token: localStorage.getItem("token"),
+            },
+          })
           .then((Response) => {
             const res = Response.data;
             console.log(res);
@@ -429,7 +450,13 @@ export default {
       console.log(confirmResult);
       if (confirmResult != "confirm") return this.$message.info("已取消删除");
       const { data: res } = await this.$http.delete(
-        "/applyInfo/deleteDriverInfo?driverInfoId=" + id
+        "/applyInfo/deleteDriverInfo?driverInfoId=" + id,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            token: localStorage.getItem("token"),
+          },
+        }
       );
       if (res.code != 200) return this.$Message.ERROR("删除用户失败！");
       this.$Message.success("删除成功！");

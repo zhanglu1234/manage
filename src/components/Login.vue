@@ -52,8 +52,8 @@ export default {
     return {
       //login表单的数据绑定
       loginform: {
-        businessname: "admin",
-        businesspassword: "123456",
+        businessname: "",
+        businesspassword: "",
       },
       //验证规则
       loginformrules: {
@@ -117,13 +117,15 @@ export default {
           .post("/businessLogin/login", this.loginform, {
             headers: {
               "Content-Type": "application/json",
+              token: localStorage.getItem("token"),
             },
           })
           .then((Response) => {
             console.log(Response);
             const res = Response.data;
-            if (res.code !== 200) return this.$Message.error("登录失败！");
+            if (res.code !== 200) return this.$Message.error(res.msg);
             this.$Message.success("登录成功！");
+            localStorage.setItem("token", res.token);
             console.log(res);
             this.$router.push("/home");
           })

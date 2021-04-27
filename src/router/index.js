@@ -3,7 +3,8 @@ import VueRouter from 'vue-router'
 import Login from '.././components/Login.vue'
 import home from '.././components/home.vue'
 import welcome from '.././components/welcome.vue'
-import goods from '.././components/goods/goods.vue'
+import applyInfo from '.././components/driverApply/applyInfo.vue'
+import orderInfo from '.././components/order/orderInfo.vue'
 
 Vue.use(VueRouter)
 
@@ -32,9 +33,19 @@ const router = new VueRouter({
 				component: welcome
 			},
 			{
-				path: '/goodslist',
-				component: goods
+				path: '/applyInfo',
+				component: applyInfo
 			}
+			]
+		},
+		{
+			path: '/home1',
+			component: home,
+			children: [
+				{
+					path: '/order',
+					component: orderInfo
+				}
 			]
 		}
 	]

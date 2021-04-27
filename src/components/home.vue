@@ -2,7 +2,7 @@
   <el-container class="home-container">
     <!--头部区域-->
     <el-header>
-      <el-button icon="el-icon-arrow-left" @click="goBack">返回</el-button>
+      <!-- <el-button icon="el-icon-arrow-left" @click="goBack">返回</el-button> -->
     </el-header>
     <!--页面主题区域-->
     <el-container>
@@ -17,30 +17,44 @@
           active-text-color="#409EFF"
           :collapse="isCollapsed"
           router
-          default-active="/goodslist"
         >
+          <!-- 默认显示 default-active="/applyInfo" -->
           <el-submenu index="2">
             <!--插槽-->
             <template slot="title">
-              <!--<i class="el-icon-menu"></i>-->
+              <i class="el-icon-menu"></i>
               <span>司机申请</span>
             </template>
             <el-menu-item-group>
-              <el-menu-item index="/goodslist">申请列表</el-menu-item>
+              <el-menu-item index="/applyInfo">申请列表</el-menu-item>
               <!--默认商品分类的路径为'/3'-->
-              <el-menu-item index="3">商品分类</el-menu-item>
+              <!-- <el-menu-item index="3">商品分类</el-menu-item> -->
               <!--<el-menu-item index="goods">商品分类</el-menu-item>-->
             </el-menu-item-group>
           </el-submenu>
-          <el-menu-item index="3">
+
+          <!-- <el-menu-item index="3">
             <i class="el-icon-document"></i>
             <span slot="title">订单管理</span>
-          </el-menu-item>
-          <el-menu-item index="4">
+          </el-menu-item> -->
+          <el-submenu index="4">
+            <!--插槽-->
+            <template slot="title">
+              <i class="el-icon-menu"></i>
+              <span>订单管理</span>
+            </template>
+            <el-menu-item-group>
+              <el-menu-item index="/order">订单列表</el-menu-item>
+              <!--默认商品分类的路径为'/3'-->
+              <!-- <el-menu-item index="3">商品分类</el-menu-item> -->
+              <!--<el-menu-item index="goods">商品分类</el-menu-item>-->
+            </el-menu-item-group>
+          </el-submenu>
+          <el-menu-item index="5">
             <i class="el-icon-setting"></i>
             <span slot="title">商品入库</span>
           </el-menu-item>
-          <el-menu-item index="5">
+          <el-menu-item index="6">
             <i class="el-icon-setting"></i>
             <span slot="title">商品出库</span>
           </el-menu-item>
