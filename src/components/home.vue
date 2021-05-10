@@ -50,10 +50,19 @@
               <!--<el-menu-item index="goods">商品分类</el-menu-item>-->
             </el-menu-item-group>
           </el-submenu>
-          <el-menu-item index="5">
-            <i class="el-icon-setting"></i>
-            <span slot="title">商品入库</span>
-          </el-menu-item>
+          <el-submenu index="5">
+            <!--插槽-->
+            <template slot="title">
+              <i class="el-icon-menu"></i>
+              <span>用户管理</span>
+            </template>
+            <el-menu-item-group>
+              <el-menu-item index="/client">客户信息列表</el-menu-item>
+              <!--默认商品分类的路径为'/3'-->
+              <!-- <el-menu-item index="3">商品分类</el-menu-item> -->
+              <!--<el-menu-item index="goods">商品分类</el-menu-item>-->
+            </el-menu-item-group>
+          </el-submenu>
           <el-menu-item index="6">
             <i class="el-icon-setting"></i>
             <span slot="title">商品出库</span>

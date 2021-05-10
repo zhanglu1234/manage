@@ -3,7 +3,7 @@
 		<!--面包屑导航-->
 		<el-breadcrumb separator-class="el-icon-arrow-left">
 			<el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
-			<el-breadcrumb-item :to="{ path: '/goodslist' }">订单列表</a>
+			<el-breadcrumb-item :to="{ path: '/order' }">订单列表</a>
 			</el-breadcrumb-item>
 		
 		</el-breadcrumb>
@@ -15,7 +15,7 @@
 				<el-col :span="7">
 					<el-input placeholder="请输入订单号" v-model="queryInfo.orderNumber">
 						<!--slot 插槽 选择放置搜索栏的先后顺序-->
-						<el-button slot="append" icon="el-icon-search" @click="getgoodslist"></el-button>
+						<el-button slot="append" icon="el-icon-search" @click="getOrderList"></el-button>
 					</el-input>
 				</el-col>
 				<!-- <el-col :span="4">
@@ -23,12 +23,12 @@
 				</el-col> -->
 			</el-row>
 			<!--用户列表区域-->
-			<!--border 边框 v-bind:data="goodslist"简写为：data="goodslist"指的是属性绑定 数据在data中
+			<!--border 边框 v-bind:data="OrderList"简写为：data="OrderList"指的是属性绑定 数据在data中
 				v-on:click=""简写为@click="" 指的是事件绑定 方法在methods中
 				v-model 数据双向绑定
 				stripe隔行变色
 			-->
-			<el-table :data="goodslist" border stripe>
+			<el-table :data="orderList" border stripe>
 
 				<!--索引列-->
 				<!--prop 对应列内容的字段名-->
@@ -38,22 +38,21 @@
 				<el-table-column label="是否缴费" prop="paymentstatus"></el-table-column>
 				<el-table-column label="缴费时间" prop="paymenttime"></el-table-column>
 				<el-table-column label="车牌号" prop="ordercarnumber"></el-table-column>
-				<el-table-column label="车型" prop="drivercartype"></el-table-column>
-				<el-table-column label="订单创建时间" prop="datetime"></el-table-column>
-				<el-table-column label="客户id" prop="orderclientid"></el-table-column>
-				<el-table-column label="司机id" prop="orderdriverinfoid"></el-table-column>
-                <el-table-column label="订单状态" prop="orderstatus"></el-table-column>
+				<el-table-column label="客户账号" prop="clientuniqueid"></el-table-column>
+				<el-table-column label="司机姓名" prop="drivername"></el-table-column>
+        <el-table-column label="订单状态" prop="orderstatus"></el-table-column>
+        <el-table-column label="预约时间" prop="datetime"></el-table-column>
 				<el-table-column label="操作">
 					<!--slot-scope作用域插槽拿到scope对象-->
 					<template slot-scope="scope">
 						<!--修改-->
-						<el-tooltip class="item" effect="dark" content="修改" placement="top">
+						<el-tooltip class="item" effect="dark" content="关联客户" placement="top">
 							<el-button type="primary" icon="el-icon-edit" circle @click="showEditDiaolog(scope.row.ordernumber)"></el-button>
 						</el-tooltip>
 
 						<!--删除-->
-						<el-tooltip class="item" effect="dark" content="删除" placement="top">
-							<el-button type="danger" icon="el-icon-delete" circle @click="removeGoodsById(scope.row.ordernumber)"></el-button>
+						<el-tooltip class="item" effect="dark" content="无效订单" placement="top">
+							<el-button type="danger" icon="el-icon-delete" circle @click="removeGoodsById(scope.row)"></el-button>
 						</el-tooltip>
 
 					</template>
@@ -64,45 +63,13 @@
 			</el-pagination>
 		</el-card>
 		<!--添加申请的对话框-->
-		<el-dialog title="添加申请" :visible.sync="addDialogVisible" width="50%" @close="addDialogClosed">
-			<!--内容主体区域  addForm 指的添加申请表单 ref指的是引用-->
-			<el-form :model="addForm" :rules="addFormRules" ref="addFormRef" label-width="80px">
-				<!--prop 验证规则  label-width指的是文本宽度-->
-				<el-form-item label="司机姓名" prop="drivername">
-					<el-input v-model="addForm.drivername"></el-input>
-				</el-form-item>
-				<el-form-item label="身份证号" prop="driveridnumber">
-					<el-input v-model="addForm.driveridnumber"></el-input>
-				</el-form-item>
-				<el-form-item label="司机电话" prop="driverphone">
-					<el-input v-model="addForm.driverphone"></el-input>
-				</el-form-item>
-				<el-form-item label="入/出园" prop="driverapplytype">
-					<el-input v-model="addForm.driverapplytype"></el-input>
-				</el-form-item>
-				<el-form-item label="车型" prop="drivercartype">
-					<el-input v-model="addForm.drivercartype"></el-input>
-				</el-form-item>
-				<el-form-item label="车牌号" prop="drivercarnumber">
-					<el-input v-model="addForm.drivercarnumber"></el-input>
-				</el-form-item>
-				<el-form-item label="预约日期" prop="applytime">
-					<el-input v-model="addForm.applytime"></el-input>
-				</el-form-item>
-			</el-form>
-			<!--底部区域-->
-			<span slot="footer" class="dialog-footer">
-  				 <el-button @click="addDialogVisible = false">取 消</el-button>
-   				 <el-button type="primary" @click="addGoods">确 定</el-button>
-  		</span>
-		</el-dialog>
-		<!--修改商品对话框-->
-		<el-dialog title="修改商品" :visible.sync="editDialogVisible" width="30%" @close="editDialogClosed">
+
+		<!--关联客户信息对话框-->
+		<el-dialog title="关联客户信息" :visible.sync="editDialogVisible" width="30%" @close="editDialogClosed">
 			<!--:rules="editFormRules" ref="editFormRef"  -->
 			<!-- 修改商品名称的规则，使用添加商品的规则-->
 			<el-form :model="editForm" ref="editFormRef" label-width="70px">
-
-                	<!--prop 验证规则  label-width指的是文本宽度-->
+      	<!--prop 验证规则  label-width指的是文本宽度-->
 				<el-form-item label="订单号" prop="ordernumber">
 					<el-input v-model="editForm.ordernumber" disabled></el-input>
 				</el-form-item>
@@ -121,9 +88,9 @@
 				<el-form-item label="客户id" prop="orderclientid">
 					<el-input v-model="editForm.orderclientid"></el-input>
 				</el-form-item>	
-			<el-form-item label="订单状态" prop="orderstatus">
+			<!-- <el-form-item label="订单状态" prop="orderstatus">
 					<el-input v-model="editForm.orderstatus" ></el-input>
-				</el-form-item>
+				</el-form-item>  -->
 			</el-form>
 			<span slot="footer" class="dialog-footer">
    					<el-button @click="editDialogVisible = false">取 消</el-button>
@@ -198,6 +165,7 @@ export default {
     };
 
     return {
+      orderstatus: "",
       //获取用户列表的参数
       queryInfo: {
         orderNumber: "",
@@ -206,82 +174,8 @@ export default {
         //当前每页显示多少条
         pageSize: 10,
       },
-      goodslist: [],
+      orderList: [],
       total: 0,
-      //控制对话框的显示与隐藏
-      addDialogVisible: false,
-      //添加司机申请出/入园表单数据
-      addForm: {
-        drivername: "",
-        driveridnumber: "",
-        driverphone: "",
-        driverapplytype: "",
-        drivercartype: "",
-        drivercarnumber: "",
-        applytime: "",
-        driverinfosource: "商务录入",
-        driverorderstatus: "0",
-      },
-      //添加司机申请出/入园表单规则
-      addFormRules: {
-        //对应prop
-        drivername: [
-          {
-            required: true,
-            message: "请输入用户名称",
-            //验证时机，即鼠标离开焦点的时候触发
-            trigger: "blur",
-          },
-        ],
-        driveridnumber: [
-          {
-            required: true,
-            message: "请输入身份证号",
-            //验证时机，即鼠标离开焦点的时候触发
-            trigger: "blur",
-          },
-          {
-            validator: checkIdCardNumber,
-            trigger: "blur",
-          },
-        ],
-        driverphone: [
-          {
-            required: true,
-            message: "请输入手机号码",
-            //验证时机，即鼠标离开焦点的时候触发
-            trigger: "blur",
-          },
-          {
-            validator: checkPhoneNumber,
-            trigger: "blur",
-          },
-        ],
-        driverapplytype: [
-          {
-            required: true,
-            message: "申请",
-            //验证时机，即鼠标离开焦点的时候触发
-            trigger: "blur",
-          },
-        ],
-        drivercarnumber: [
-          {
-            required: true,
-            message: "请输入车牌号",
-            //验证时机，即鼠标离开焦点的时候触发
-            trigger: "blur",
-          },
-        ],
-        drivercartype: [
-          {
-            required: true,
-            message: "请输入出/入园",
-            //验证时机，即鼠标离开焦点的时候触发
-            trigger: "blur",
-          },
-        ],
-      },
       //控制对话框的修改与隐藏
       editDialogVisible: false,
       //查询到的商品信息对象
@@ -289,7 +183,7 @@ export default {
         ordernumber: "",
         orderstatus: "",
         payment: "",
-        paymentstatus: "",
+        // paymentstatus: "",
         paymenttime: "",
         eventtype: "",
         ordercarnumber: "",
@@ -300,10 +194,10 @@ export default {
     };
   },
   created() {
-    this.getgoodslist();
+    this.getOrderList();
   },
   methods: {
-    async getgoodslist() {
+    async getOrderList() {
       await this.$http
         .post("/order/getAllOrderInfo", this.queryInfo, {
           headers: {
@@ -319,7 +213,8 @@ export default {
           if (res.code != 200) {
             return this.$Message.error("获取用户数据失败");
           }
-          this.goodslist = res.data.list;
+          this.orderList = res.data.list;
+          console.log(this.getOrderList);
           this.total = res.data.total;
         })
         .catch((Error) => {
@@ -332,50 +227,24 @@ export default {
       console.log("指的是每页展示多少条数据");
       console.log(newSize);
       this.queryInfo.pageSize = newSize;
-      this.getgoodslist();
+      this.getOrderList();
     },
     //监听页码值,指的是具体选择哪一页
     handleCurrentChange(newPage) {
       console.log("指的是具体选择哪一页");
       console.log(newPage);
       this.queryInfo.pageNum = newPage;
-      this.getgoodslist();
+      this.getOrderList();
     },
     //监听添加商品对话框的关闭事件
     addDialogClosed() {
       //调用addFormRef引用的reset方法实现表单重置
       this.$refs.addFormRef.resetFields();
     },
-    addGoods() {
-      //=>箭头指的是回调函数
-      //箭头函数接受校验结果 也就是增加商品之前进行预校验 返回valid值为true或者false
-      this.$refs.addFormRef.validate(async (valid) => {
-        console.log(valid);
-        //校验失败直接返回不添加商品
-        if (!valid) return;
-        //返回为true则向浏览器发送真正的添加商品的请求
-        const { data: res } = await this.$http.post(
-          "/applyInfo/insertInfo",
-          this.addForm,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              token: localStorage.getItem("token"),
-            },
-          }
-        );
-        if (res.code != 200) {
-          this.$message.error("添加订单失败！");
-        }
-        this.$message.success("添加订单成功！");
-        this.addDialogVisible = false;
-        this.getgoodslist();
-      });
-    },
 
-    //修改商品对话框
+    //修改订单对话框
     async showEditDiaolog(ordernumber) {
-      console.log("获取用户id");
+      console.log("获取订单号ordernumber");
       console.log(ordernumber);
       await this.$http
         .get("/order/getOrderInfoByOrderNumber/?orderNumber=" + ordernumber, {
@@ -402,8 +271,10 @@ export default {
     editDialogClosed() {
       this.$refs.editFormRef.resetFields();
     },
-    //修改商品信息并提交
+    //绑定客户信息
     editGoodsInfo() {
+      // 订单有效1，订单无效-1 订单状态默认为1
+
       //validate校验是否成功
       this.$refs.editFormRef.validate(async (valid) => {
         //				console.log(valid)
@@ -420,9 +291,9 @@ export default {
           .then((Response) => {
             const res = Response.data;
             console.log(res);
-            if (res.code != 200) {
-              return this.$message.error("更新用户失败");
-            }
+            if (res.code != 200) return this.$message.error(res.msg);
+
+            this.$Message.success("更新订单信息成功！");
           })
           .catch((error) => {
             console.log(error);
@@ -431,16 +302,15 @@ export default {
         //1.关闭对话框
         this.editDialogVisible = false;
         //2.刷新数据列表
-        this.getgoodslist();
+        this.getOrderList();
         //3.提示修改成功
-        this.$Message.success("更新订单信息成功！");
       });
     },
-    //根据id删除信息
-    async removeGoodsById(id) {
+    //根据订单号无效信息
+    async removeGoodsById(orderInfo) {
       //弹框提示
       const confirmResult = await this.$confirm(
-        "此操作将永久删除该记录, 是否继续?",
+        "此操作将删除订单, 是否继续?",
         "提示",
         {
           confirmButtonText: "确定",
@@ -452,12 +322,21 @@ export default {
       //确认删除返回值为confirm，取消返回cancel
       console.log(confirmResult);
       if (confirmResult != "confirm") return this.$message.info("已取消删除");
-      const { data: res } = await this.$http.delete(
-        "/applyInfo/deleteDriverInfo?driverInfoId=" + id
+      orderInfo.orderstatus = -1;
+      const { data: res } = await this.$http.patch(
+        "/order/deleteOrderInfo",
+        orderInfo,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            token: localStorage.getItem("token"),
+          },
+        }
       );
-      if (res.code != 200) return this.$Message.ERROR("删除用户失败！");
+      console.log(res);
+      if (res.code != 200) return this.$Message.error("删除订单失败！");
       this.$Message.success("删除成功！");
-      this.getgoodslist();
+      this.getOrderList();
     },
   },
 };

@@ -5,6 +5,8 @@ import home from '.././components/home.vue'
 import welcome from '.././components/welcome.vue'
 import applyInfo from '.././components/driverApply/applyInfo.vue'
 import orderInfo from '.././components/order/orderInfo.vue'
+import clientInfo from '.././components/client/clientInfo.vue'
+import test from '../components/test.vue'
 
 Vue.use(VueRouter)
 
@@ -39,7 +41,7 @@ const router = new VueRouter({
 			]
 		},
 		{
-			path: '/home1',
+			path: '/home',
 			component: home,
 			children: [
 				{
@@ -47,6 +49,19 @@ const router = new VueRouter({
 					component: orderInfo
 				}
 			]
+		},
+		{
+			path: '/home',
+			component: home,
+			children: [
+				{
+					path: '/client',
+					component: clientInfo
+				}
+			]
+		}, {
+			path: '/test',
+			component: test
 		}
 	]
 })

@@ -15,7 +15,7 @@
 				<el-col :span="7">
 					<el-input placeholder="请输入用户id" v-model="queryInfo.driverInfoId">
 						<!--slot 插槽 选择放置搜索栏的先后顺序-->
-						<el-button slot="append" icon="el-icon-search" @click="getgoodslist"></el-button>
+						<el-button slot="append" icon="el-icon-search" @click="getApplyList"></el-button>
 					</el-input>
 				</el-col>
 				<el-col :span="4">
@@ -23,12 +23,12 @@
 				</el-col>
 			</el-row>
 			<!--用户列表区域-->
-			<!--border 边框 v-bind:data="goodslist"简写为：data="goodslist"指的是属性绑定 数据在data中
+			<!--border 边框 v-bind:data="applylist"简写为：data="applylist"指的是属性绑定 数据在data中
 				v-on:click=""简写为@click="" 指的是事件绑定 方法在methods中
 				v-model 数据双向绑定
 				stripe隔行变色
 			-->
-			<el-table :data="goodslist" border stripe>
+			<el-table :data="applylist" border stripe>
 
 				<!--索引列-->
 				<!--prop 对应列内容的字段名-->
@@ -93,11 +93,11 @@
 			<!--底部区域-->
 			<span slot="footer" class="dialog-footer">
   				 <el-button @click="addDialogVisible = false">取 消</el-button>
-   				 <el-button type="primary" @click="addGoods">确 定</el-button>
+   				 <el-button type="primary" @click="addGoods">确认</el-button>
   		</span>
 		</el-dialog>
 		<!--修改商品对话框-->
-		<el-dialog title="修改商品" :visible.sync="editDialogVisible" width="30%" @close="editDialogClosed">
+		<el-dialog title="审核申请信息" :visible.sync="editDialogVisible" width="30%" @close="editDialogClosed">
 			<!--:rules="editFormRules" ref="editFormRef"  -->
 			<!-- 修改商品名称的规则，使用添加商品的规则-->
 			<el-form :model="editForm" ref="editFormRef" label-width="70px">
@@ -116,18 +116,15 @@
 					<el-input v-model="editForm.driverapplytype" disabled></el-input>
 				</el-form-item>
 				<el-form-item label="车牌号" prop="drivercarnumber">
-					<el-input v-model="editForm.drivercarnumber"></el-input>
-				</el-form-item>
-				<el-form-item label="信息状态" prop="driverorderstatus">
-					<el-input v-model="editForm.driverorderstatus"></el-input>
+					<el-input v-model="editForm.drivercarnumber" disabled></el-input>
 				</el-form-item>
 				<el-form-item label="预约日期" prop="applytime">
-					<el-input v-model="editForm.applytime"></el-input>
+					<el-input v-model="editForm.applytime" disabled></el-input>
 				</el-form-item>
 			</el-form>
 			<span slot="footer" class="dialog-footer">
    					<el-button @click="editDialogVisible = false">取 消</el-button>
-    					<el-button type="primary" @click="editGoodsInfo">确 定</el-button>
+    					<el-button type="primary" @click="editGoodsInfo">同意</el-button>
   			</span>
 		</el-dialog>
 		<!--删除用户弹窗-->
@@ -206,7 +203,7 @@ export default {
         //当前每页显示多少条
         pageSize: 10,
       },
-      goodslist: [],
+      applylist: [],
       total: 0,
       //控制对话框的显示与隐藏
       addDialogVisible: false,
@@ -292,15 +289,16 @@ export default {
         driverapplytype: "",
         drivercartype: "",
         drivercarnumber: "",
+        driverorderstatus: "",
         applytime: "",
       },
     };
   },
   created() {
-    this.getgoodslist();
+    this.getApplyList();
   },
   methods: {
-    async getgoodslist() {
+    async getApplyList() {
       await this.$http
         .post("/applyInfo/AllDriverInfoByManage", this.queryInfo, {
           headers: {
@@ -314,9 +312,9 @@ export default {
           console.log(Response.data);
           const res = Response.data;
           if (res.code != 200) {
-            return this.$Message.error("获取用户数据失败");
+            return this.$Message.error("获取司机申请信息失败");
           }
-          this.goodslist = res.data.list;
+          this.applylist = res.data.list;
           this.total = res.data.total;
         })
         .catch((Error) => {
@@ -329,16 +327,16 @@ export default {
       console.log("指的是每页展示多少条数据");
       console.log(newSize);
       this.queryInfo.pageSize = newSize;
-      this.getgoodslist();
+      this.getApplyList();
     },
     //监听页码值,指的是具体选择哪一页
     handleCurrentChange(newPage) {
       console.log("指的是具体选择哪一页");
       console.log(newPage);
       this.queryInfo.pageNum = newPage;
-      this.getgoodslist();
+      this.getApplyList();
     },
-    //监听添加商品对话框的关闭事件
+    //监听添加申请对话框的关闭事件
     addDialogClosed() {
       //调用addFormRef引用的reset方法实现表单重置
       this.$refs.addFormRef.resetFields();
@@ -348,7 +346,7 @@ export default {
       //箭头函数接受校验结果 也就是增加商品之前进行预校验 返回valid值为true或者false
       this.$refs.addFormRef.validate(async (valid) => {
         console.log(valid);
-        //校验失败直接返回不添加商品
+        //校验失败直接返回不添加申请
         if (!valid) return;
         //返回为true则向浏览器发送真正的添加商品的请求
         const { data: res } = await this.$http.post(
@@ -362,15 +360,15 @@ export default {
           }
         );
         if (res.code != 200) {
-          this.$message.error("添加商品失败！");
+          this.$message.error("添加申请失败！");
         }
-        this.$message.success("添加商品成功！");
+        this.$message.success("添加申请成功！");
         this.addDialogVisible = false;
-        this.getgoodslist();
+        this.getApplyList();
       });
     },
 
-    //修改商品对话框
+    //审核信息对话框
     async showEditDiaolog(driverinfoid) {
       console.log("获取用户id");
       console.log(driverinfoid);
@@ -384,7 +382,7 @@ export default {
         .then((Response) => {
           const res = Response.data;
           if (res.code != 200) {
-            this.$message.error("查询商品失败！");
+            this.$message.error("查询信息失败！");
           }
           console.log(res.data);
           this.editForm = res.data;
@@ -399,8 +397,9 @@ export default {
     editDialogClosed() {
       this.$refs.editFormRef.resetFields();
     },
-    //修改商品信息并提交
+    //确认审核申请信息
     editGoodsInfo() {
+      this.editForm.driverorderstatus = 1;
       //validate校验是否成功
       this.$refs.editFormRef.validate(async (valid) => {
         //				console.log(valid)
@@ -417,9 +416,9 @@ export default {
           .then((Response) => {
             const res = Response.data;
             console.log(res);
-            if (res.code != 200) {
-              return this.$message.error("更新用户失败");
-            }
+            if (res.code != 200) return this.$message.error("更新信息成功！");
+            //3.提示修改成功
+            this.$Message.success("信息已审核！");
           })
           .catch((error) => {
             console.log(error);
@@ -428,13 +427,12 @@ export default {
         //1.关闭对话框
         this.editDialogVisible = false;
         //2.刷新数据列表
-        this.getgoodslist();
-        //3.提示修改成功
-        this.$Message.success("更新商品信息成功！");
+        this.getApplyList();
       });
     },
     //根据id删除信息
     async removeGoodsById(id) {
+      console.log(id);
       //弹框提示
       const confirmResult = await this.$confirm(
         "此操作将永久删除该记录, 是否继续?",
@@ -458,9 +456,9 @@ export default {
           },
         }
       );
-      if (res.code != 200) return this.$Message.ERROR("删除用户失败！");
+      if (res.code != 200) return this.$Message.error("删除用户失败！");
       this.$Message.success("删除成功！");
-      this.getgoodslist();
+      this.getApplyList();
     },
   },
 };
