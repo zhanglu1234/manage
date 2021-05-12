@@ -13,7 +13,7 @@
 			<!--搜索与添加窗口-->
 			<el-row :gutter="20">
 				<el-col :span="7">
-					<el-input placeholder="请输入订单号" v-model="queryInfo.orderNumber">
+					<el-input placeholder="请输入订单号" v-model="queryInfo.id">
 						<!--slot 插槽 选择放置搜索栏的先后顺序-->
 						<el-button slot="append" icon="el-icon-search" @click="getOrderList"></el-button>
 					</el-input>
@@ -33,25 +33,26 @@
 				<!--索引列-->
 				<!--prop 对应列内容的字段名-->
 				<el-table-column type="index" label="#"></el-table-column>
+        <el-table-column label="ID" prop="id"></el-table-column>
 				<el-table-column label="订单号" prop="ordernumber"></el-table-column>	
-				<el-table-column label="缴费金额" prop="payment"></el-table-column>
-				<el-table-column label="是否缴费" prop="paymentstatus"></el-table-column>
-				<el-table-column label="缴费时间" prop="paymenttime"></el-table-column>
-				<el-table-column label="车牌号" prop="ordercarnumber"></el-table-column>
+				<el-table-column label="缴费金额" prop="orderpayment"></el-table-column>
+				<el-table-column label="是否缴费" prop="orderpaymentstatus"></el-table-column>
+				<el-table-column label="缴费时间" prop="orderpaymenttime"></el-table-column>
+				<el-table-column label="车牌号" prop="drivercarnumber"></el-table-column>
 				<el-table-column label="客户账号" prop="clientuniqueid"></el-table-column>
 				<el-table-column label="司机姓名" prop="drivername"></el-table-column>
         <el-table-column label="订单状态" prop="orderstatus"></el-table-column>
-        <el-table-column label="预约时间" prop="datetime"></el-table-column>
+        <el-table-column label="预约日期" prop="applydate"></el-table-column>
 				<el-table-column label="操作">
 					<!--slot-scope作用域插槽拿到scope对象-->
 					<template slot-scope="scope">
 						<!--修改-->
 						<el-tooltip class="item" effect="dark" content="关联客户" placement="top">
-							<el-button type="primary" icon="el-icon-edit" circle @click="showEditDiaolog(scope.row.ordernumber)"></el-button>
+							<el-button type="primary" icon="el-icon-edit" circle @click="showEditDiaolog(scope.row.id)"></el-button>
 						</el-tooltip>
 
 						<!--删除-->
-						<el-tooltip class="item" effect="dark" content="无效订单" placement="top">
+						<el-tooltip class="item" effect="dark" content="删除订单" placement="top">
 							<el-button type="danger" icon="el-icon-delete" circle @click="removeGoodsById(scope.row)"></el-button>
 						</el-tooltip>
 
@@ -73,14 +74,14 @@
 				<el-form-item label="订单号" prop="ordernumber">
 					<el-input v-model="editForm.ordernumber" disabled></el-input>
 				</el-form-item>
-				<el-form-item label="缴费金额" prop="payment">
-					<el-input v-model="editForm.payment" disabled></el-input>
+				<el-form-item label="缴费金额" prop="orderpayment">
+					<el-input v-model="editForm.orderpayment" disabled></el-input>
 				</el-form-item>
-        <el-form-item label="缴费状态" prop="paymentstatus">
-					<el-input v-model="editForm.paymentstatus" disabled></el-input>
+        <el-form-item label="缴费状态" prop="orderpaymentstatus">
+					<el-input v-model="editForm.orderpaymentstatus" disabled></el-input>
 				</el-form-item>
-				<el-form-item label="缴费时间" prop="paymenttime">
-					<el-input v-model="editForm.paymenttime" disabled></el-input>
+				<el-form-item label="缴费时间" prop="orderpaymenttime">
+					<el-input v-model="editForm.orderpaymenttime" disabled></el-input>
 				</el-form-item>
         	<el-form-item label="司机id" prop="orderdriverinfoid">
 					<el-input v-model="editForm.orderdriverinfoid" disabled></el-input>
@@ -168,7 +169,7 @@ export default {
       orderstatus: "",
       //获取用户列表的参数
       queryInfo: {
-        orderNumber: "",
+        id: "",
         //当前页数
         pageNum: 1,
         //当前每页显示多少条
@@ -180,16 +181,15 @@ export default {
       editDialogVisible: false,
       //查询到的商品信息对象
       editForm: {
-        ordernumber: "",
         orderstatus: "",
-        payment: "",
-        // paymentstatus: "",
-        paymenttime: "",
-        eventtype: "",
-        ordercarnumber: "",
-        orderclientId: "",
-        orderdriverinfoId: "",
-        datetime: "",
+        orderpayment: "",
+        orderpaymentstatus: "",
+        orderpaymenttime: "",
+        drivercarnumber: "",
+        orderclientid: "",
+        orderdriverinfoid: "",
+        ordernumber: "",
+        createby: "auto",
       },
     };
   },
@@ -214,6 +214,9 @@ export default {
             return this.$Message.error("获取用户数据失败");
           }
           this.orderList = res.data.list;
+          for (var i = 0; i < this.orderList.length; i++) {
+            this.orderList[i].applydate += " " + this.orderList[i].applytime;
+          }
           console.log(this.getOrderList);
           this.total = res.data.total;
         })
@@ -243,11 +246,11 @@ export default {
     },
 
     //修改订单对话框
-    async showEditDiaolog(ordernumber) {
+    async showEditDiaolog(id) {
       console.log("获取订单号ordernumber");
-      console.log(ordernumber);
+      console.log(id);
       await this.$http
-        .get("/order/getOrderInfoByOrderNumber/?orderNumber=" + ordernumber, {
+        .get("/order/getOrderInfoByOrderId/?id=" + id, {
           headers: {
             "Content-Type": "application/json",
             token: localStorage.getItem("token"),
@@ -255,6 +258,7 @@ export default {
         })
         .then((Response) => {
           const res = Response.data;
+          console.log(res);
           if (res.code != 200) {
             this.$message.error("查询订单失败！");
           }

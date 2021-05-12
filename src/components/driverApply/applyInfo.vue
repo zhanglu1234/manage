@@ -13,7 +13,7 @@
 			<!--搜索与添加窗口-->
 			<el-row :gutter="20">
 				<el-col :span="7">
-					<el-input placeholder="请输入用户id" v-model="queryInfo.driverInfoId">
+					<el-input placeholder="请输入用户id" v-model="queryInfo.id">
 						<!--slot 插槽 选择放置搜索栏的先后顺序-->
 						<el-button slot="append" icon="el-icon-search" @click="getApplyList"></el-button>
 					</el-input>
@@ -33,27 +33,26 @@
 				<!--索引列-->
 				<!--prop 对应列内容的字段名-->
 				<el-table-column type="index" label="#"></el-table-column>
-				<el-table-column label="司机id" prop="driverinfoid"></el-table-column>
+				<el-table-column label="司机id" prop="id"></el-table-column>
 				<el-table-column label="司机姓名" prop="drivername"></el-table-column>
 				<el-table-column label="司机身份证号" prop="driveridnumber"></el-table-column>
 				<el-table-column label="司机电话" prop="driverphone"></el-table-column>
 				<el-table-column label="申请入/出园" prop="driverapplytype"></el-table-column>
-				<el-table-column label="申请状态" prop="driverorderstatus"></el-table-column>
+				<el-table-column label="申请状态" prop="driverapplystatus"></el-table-column>
 				<el-table-column label="车型" prop="drivercartype"></el-table-column>
 				<el-table-column label="车牌号" prop="drivercarnumber"></el-table-column>
-				<el-table-column label="申请来源" prop="driverinfosource"></el-table-column>
-				<el-table-column label="预约日期" prop="applytime"></el-table-column>
+				<el-table-column label="预约日期" prop="applydate"></el-table-column>
 				<el-table-column label="操作">
 					<!--slot-scope作用域插槽拿到scope对象-->
 					<template slot-scope="scope">
 						<!--修改-->
 						<el-tooltip class="item" effect="dark" content="修改" placement="top">
-							<el-button type="primary" icon="el-icon-edit" circle @click="showEditDiaolog(scope.row.driverinfoid)"></el-button>
+							<el-button type="primary" icon="el-icon-edit" circle @click="showEditDiaolog(scope.row.id)"></el-button>
 						</el-tooltip>
 
 						<!--删除-->
 						<el-tooltip class="item" effect="dark" content="删除" placement="top">
-							<el-button type="danger" icon="el-icon-delete" circle @click="removeGoodsById(scope.row.driverinfoid)"></el-button>
+							<el-button type="danger" icon="el-icon-delete" circle @click="removeGoodsById(scope.row)"></el-button>
 						</el-tooltip>
 
 					</template>
@@ -77,17 +76,31 @@
 				<el-form-item label="司机电话" prop="driverphone">
 					<el-input v-model="addForm.driverphone"></el-input>
 				</el-form-item>
-				<el-form-item label="入/出园" prop="driverapplytype">
-					<el-input v-model="addForm.driverapplytype"></el-input>
-				</el-form-item>
-				<el-form-item label="车型" prop="drivercartype">
-					<el-input v-model="addForm.drivercartype"></el-input>
-				</el-form-item>
-				<el-form-item label="车牌号" prop="drivercarnumber">
+                <el-form-item label="车牌号" prop="drivercarnumber">
 					<el-input v-model="addForm.drivercarnumber"></el-input>
 				</el-form-item>
-				<el-form-item label="预约日期" prop="applytime">
-					<el-input v-model="addForm.applytime"></el-input>
+                <el-form-item label="入/出园" prop="driverapplytype" >
+				 <el-select v-model="addForm.driverapplytype" style="width:100%;">
+                            <el-option label="出园" value="1"></el-option>
+                            <el-option label="入园" value="2"></el-option>
+                </el-select>
+				</el-form-item>
+				<el-form-item label="车型" prop="drivercartype" >
+					 <el-select v-model="addForm.drivercartype" style="width: 100%;">
+                            <el-option label="卡车" value="1"></el-option>
+                            <el-option label="货车" value="2"></el-option>
+                            <el-option label="汽车" value="3"></el-option>
+                </el-select>
+				</el-form-item>
+				<el-form-item label="预约日期"  >
+					 <el-date-picker v-model="addForm.applydate" type="date" placeholder="选择日期" style="width: 50%;">
+           </el-date-picker>
+                     <el-select  v-model="addForm.applytime"  placeholder="请选择时段" style="width: 50%;">
+                       <el-option label="6:00-9:00" value="1"></el-option>
+                       <el-option label="9:00-12:00" value="2"></el-option>
+                       <el-option label="12:00-15:00" value="3"></el-option>
+                       <el-option label="15:00-18:00" value="4"></el-option>
+                     </el-select>
 				</el-form-item>
 			</el-form>
 			<!--底部区域-->
@@ -115,11 +128,19 @@
 				<el-form-item label="入/出园" prop="driverapplytype">
 					<el-input v-model="editForm.driverapplytype" disabled></el-input>
 				</el-form-item>
-				<el-form-item label="车牌号" prop="drivercarnumber">
-					<el-input v-model="editForm.drivercarnumber" disabled></el-input>
-				</el-form-item>
-				<el-form-item label="预约日期" prop="applytime">
-					<el-input v-model="editForm.applytime" disabled></el-input>
+			
+				<!-- <el-form-item label="预约日期" prop="applydate">
+					<el-input v-model="editForm.applydate" disabled ></el-input>
+				</el-form-item> -->
+        <el-form-item label="预约日期"  >
+					 <el-date-picker v-model="editForm.applydate" type="date" placeholder="选择日期" style="width: 50%;">
+           </el-date-picker>
+                     <el-select  v-model="editForm.applytime"  placeholder="请选择时段" style="width: 50%;">
+                       <el-option label="6:00-9:00" value="1"></el-option>
+                       <el-option label="9:00-12:00" value="2"></el-option>
+                       <el-option label="12:00-15:00" value="3"></el-option>
+                       <el-option label="15:00-18:00" value="4"></el-option>
+                     </el-select>
 				</el-form-item>
 			</el-form>
 			<span slot="footer" class="dialog-footer">
@@ -195,9 +216,10 @@ export default {
     };
 
     return {
+      selectApplyType: "",
       //获取用户列表的参数
       queryInfo: {
-        driverInfoId: "",
+        id: "",
         //当前页数
         pageNum: 1,
         //当前每页显示多少条
@@ -216,8 +238,9 @@ export default {
         drivercartype: "",
         drivercarnumber: "",
         applytime: "",
-        driverinfosource: "商务录入",
-        driverorderstatus: "0",
+        createby: "商务录入",
+        driverapplystatus: "0",
+        applydate: "",
       },
       //添加司机申请出/入园表单规则
       addFormRules: {
@@ -254,10 +277,10 @@ export default {
             trigger: "blur",
           },
         ],
-        driverapplytype: [
+        drivercarnumber: [
           {
             required: true,
-            message: "申请",
+            message: "请输入车牌号",
             //验证时机，即鼠标离开焦点的时候触发
             trigger: "blur",
           },
@@ -270,10 +293,42 @@ export default {
             trigger: "blur",
           },
         ],
+        drivercarnumber: [
+          {
+            required: true,
+            message: "请输入车牌号",
+            //验证时机，即鼠标离开焦点的时候触发
+            trigger: "blur",
+          },
+        ],
+        driverapplytype: [
+          {
+            required: true,
+            message: "请选择出入园",
+            //验证时机，即鼠标离开焦点的时候触发
+            trigger: "blur",
+          },
+        ],
         drivercartype: [
           {
             required: true,
-            message: "请输入出/入园",
+            message: "请选择车类型",
+            //验证时机，即鼠标离开焦点的时候触发
+            trigger: "blur",
+          },
+        ],
+        applytime: [
+          {
+            required: true,
+            message: "请选择日期",
+            //验证时机，即鼠标离开焦点的时候触发
+            trigger: "blur",
+          },
+        ],
+        contracttime: [
+          {
+            required: true,
+            message: "请选择预约时段",
             //验证时机，即鼠标离开焦点的时候触发
             trigger: "blur",
           },
@@ -289,7 +344,8 @@ export default {
         driverapplytype: "",
         drivercartype: "",
         drivercarnumber: "",
-        driverorderstatus: "",
+        driverapplystatus: "",
+        applydate: "",
         applytime: "",
       },
     };
@@ -315,6 +371,8 @@ export default {
             return this.$Message.error("获取司机申请信息失败");
           }
           this.applylist = res.data.list;
+          for (var i = 0; i < this.applylist.length; i++)
+            this.applylist[i].applydate += " " + this.applylist[i].applytime;
           this.total = res.data.total;
         })
         .catch((Error) => {
@@ -369,11 +427,11 @@ export default {
     },
 
     //审核信息对话框
-    async showEditDiaolog(driverinfoid) {
+    async showEditDiaolog(id) {
       console.log("获取用户id");
-      console.log(driverinfoid);
+      console.log(id);
       await this.$http
-        .get("/applyInfo/infoByDriverInfoId/?driverInfoId=" + driverinfoid, {
+        .get("/applyInfo/infoByDriverInfoId/?id=" + id, {
           headers: {
             "Content-Type": "application/json",
             token: localStorage.getItem("token"),
@@ -386,7 +444,7 @@ export default {
           }
           console.log(res.data);
           this.editForm = res.data;
-
+          console.log(this.editForm);
           this.editDialogVisible = true;
         })
         .catch((error) => {
@@ -399,7 +457,9 @@ export default {
     },
     //确认审核申请信息
     editGoodsInfo() {
-      this.editForm.driverorderstatus = 1;
+      console.log("确认审核申请信息");
+      // this.editForm.driverapplystatus = 1;
+      console.log(this.editForm);
       //validate校验是否成功
       this.$refs.editFormRef.validate(async (valid) => {
         //				console.log(valid)
@@ -416,7 +476,7 @@ export default {
           .then((Response) => {
             const res = Response.data;
             console.log(res);
-            if (res.code != 200) return this.$message.error("更新信息成功！");
+            if (res.code != 200) return this.$message.error(res.msg);
             //3.提示修改成功
             this.$Message.success("信息已审核！");
           })
@@ -430,9 +490,19 @@ export default {
         this.getApplyList();
       });
     },
+
     //根据id删除信息
-    async removeGoodsById(id) {
-      console.log(id);
+    async removeGoodsById(applyInfo) {
+      console.log(applyInfo);
+      // console.log(id);
+      // applyInfo.applydate = applyInfo.applydate.substring(0, 10);
+      // applyInfo.applydate = new Date(
+      //   Date.parse(applyInfo.applydate).format("yyyy-MM-dd")
+      // );
+      // var str = applyInfo.applydate.substring(0, 10);
+      // applyInfo.applydate = new Date(str);
+      // //  var dataStr=myDate.getFullYear()+"-"+ (myDate.getMonth()+1) +"-"+myDate.getDate();
+      // console.log(applyInfo.applydate);
       //弹框提示
       const confirmResult = await this.$confirm(
         "此操作将永久删除该记录, 是否继续?",
@@ -447,8 +517,10 @@ export default {
       //确认删除返回值为confirm，取消返回cancel
       console.log(confirmResult);
       if (confirmResult != "confirm") return this.$message.info("已取消删除");
-      const { data: res } = await this.$http.delete(
-        "/applyInfo/deleteDriverInfo?driverInfoId=" + id,
+      applyInfo.driverapplystatus = -1;
+      const { data: res } = await this.$http.patch(
+        "/applyInfo/deleteDriverInfo",
+        applyInfo,
         {
           headers: {
             "Content-Type": "application/json",
@@ -465,4 +537,10 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.el-select .el-input {
+  width: 130px;
+}
+.input-with-select .el-input-group__prepend {
+  background-color: #fff;
+}
 </style>

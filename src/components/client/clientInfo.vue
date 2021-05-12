@@ -13,7 +13,7 @@
 			<!--搜索与添加窗口-->
 			<el-row :gutter="20">
 				<el-col :span="7">
-					<el-input placeholder="请输入客户id" v-model="queryInfo.clientId">
+					<el-input placeholder="请输入客户id" v-model="queryInfo.id">
 						<!--slot 插槽 选择放置搜索栏的先后顺序-->
 						<el-button slot="append" icon="el-icon-search" @click="getClientList"></el-button>
 					</el-input>
@@ -33,25 +33,24 @@
 				<!--索引列-->
 				<!--prop 对应列内容的字段名-->
 				<el-table-column type="index" label="#"></el-table-column>
-				<el-table-column label="客户id" prop="clientid"></el-table-column>	
+				<el-table-column label="客户id" prop="id"></el-table-column>	
 				<el-table-column label="客户账号" prop="clientuniqueid"></el-table-column>
 				<el-table-column label="客户密码" prop="clientpassword"></el-table-column>
         <el-table-column label="客户姓名" prop="clientname"></el-table-column>
 				<el-table-column label="手机号码" prop="clientphone"></el-table-column>
 				<el-table-column label="登录错误次数" prop="clientloginerror"></el-table-column>
 				<el-table-column label="客户允许登录时间" prop="clientallowedlogintime"></el-table-column>
-      	<el-table-column label="创建时间" prop="datetime"></el-table-column>
 				<el-table-column label="操作">
 					<!--slot-scope作用域插槽拿到scope对象-->
 					<template slot-scope="scope">
 						<!--修改-->
 						<el-tooltip class="item" effect="dark" content="修改" placement="top">
-							<el-button type="primary" icon="el-icon-edit" circle @click="showEditDiaolog(scope.row.clientid)"></el-button>
+							<el-button type="primary" icon="el-icon-edit" circle @click="showEditDiaolog(scope.row.id)"></el-button>
 						</el-tooltip>
 
 						<!--删除-->
 						<el-tooltip class="item" effect="dark" content="删除" placement="top">
-							<el-button type="danger" icon="el-icon-delete" circle @click="removeClientById(scope.row.clientid)"></el-button>
+							<el-button type="danger" icon="el-icon-delete" circle @click="removeClientById(scope.row.id)"></el-button>
 						</el-tooltip>
 
 					</template>
@@ -94,8 +93,8 @@
 			<el-form :model="editForm" ref="editFormRef" label-width="70px">
 
                 	<!--prop 验证规则  label-width指的是文本宽度-->
-			<el-form-item label="客户id" prop="clientid">
-					<el-input v-model="editForm.clientid" disabled></el-input>
+			<el-form-item label="客户id" prop="id">
+					<el-input v-model="editForm.id" disabled></el-input>
 				</el-form-item>
 				<el-form-item label="客户账号" prop="clientuniqueid">
 					<el-input v-model="editForm.clientuniqueid" disabled></el-input>
@@ -137,7 +136,7 @@ export default {
     return {
       //获取用户列表的参数
       queryInfo: {
-        clientId: null,
+        id: null,
         //当前页数
         pageNum: 1,
         //当前每页显示多少条
@@ -198,7 +197,7 @@ export default {
       editDialogVisible: false,
       //查询到的客户信息
       editForm: {
-        clientid: "",
+        id: "",
         clientuniqueid: "",
         clientname: "",
         clientpassword: "",
@@ -282,11 +281,11 @@ export default {
     },
 
     //修改客户信息对话框
-    async showEditDiaolog(clientid) {
+    async showEditDiaolog(id) {
       console.log("获取订单号ordernumber");
-      console.log(clientid);
+      console.log(id);
       await this.$http
-        .get("/clientInfo/selectByClientId/?clientId=" + clientid, {
+        .get("/clientInfo/selectByClientId/?id=" + id, {
           headers: {
             "Content-Type": "application/json",
             token: localStorage.getItem("token"),
@@ -345,7 +344,7 @@ export default {
       });
     },
     //根据订单号删除信息
-    async removeClientById(clientid) {
+    async removeClientById(id) {
       //弹框提示
       const confirmResult = await this.$confirm(
         "此操作将永久删除该记录, 是否继续?",
@@ -361,7 +360,7 @@ export default {
       console.log(confirmResult);
       if (confirmResult != "confirm") return this.$message.info("已取消删除");
       const { data: res } = await this.$http.delete(
-        "/clientInfo/deleteClientInfo?clientId=" + clientid,
+        "/clientInfo/deleteClientInfo?id=" + id,
         {
           headers: {
             "Content-Type": "application/json",
