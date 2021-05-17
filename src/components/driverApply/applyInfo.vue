@@ -33,10 +33,10 @@
 				<!--索引列-->
 				<!--prop 对应列内容的字段名-->
 				<el-table-column type="index" label="#"></el-table-column>
-				<el-table-column label="司机id" prop="id"></el-table-column>
+				<el-table-column label="id" prop="id"></el-table-column>
 				<el-table-column label="司机姓名" prop="drivername"></el-table-column>
-				<el-table-column label="司机身份证号" prop="driveridnumber"></el-table-column>
-				<el-table-column label="司机电话" prop="driverphone"></el-table-column>
+				<el-table-column label="司机身份证号" prop="cardnumber"></el-table-column>
+				<el-table-column label="司机电话" prop="telphone"></el-table-column>
 				<el-table-column label="申请入/出园" prop="driverapplytype"></el-table-column>
 				<el-table-column label="申请状态" prop="driverapplystatus"></el-table-column>
 				<el-table-column label="车型" prop="drivercartype"></el-table-column>
@@ -67,14 +67,8 @@
 			<!--内容主体区域  addForm 指的添加申请表单 ref指的是引用-->
 			<el-form :model="addForm" :rules="addFormRules" ref="addFormRef" label-width="80px">
 				<!--prop 验证规则  label-width指的是文本宽度-->
-				<el-form-item label="司机姓名" prop="drivername">
-					<el-input v-model="addForm.drivername"></el-input>
-				</el-form-item>
-				<el-form-item label="身份证号" prop="driveridnumber">
-					<el-input v-model="addForm.driveridnumber"></el-input>
-				</el-form-item>
-				<el-form-item label="司机电话" prop="driverphone">
-					<el-input v-model="addForm.driverphone"></el-input>
+				<el-form-item label="司机id" prop="driverid">
+					<el-input v-model="addForm.driverid"></el-input>
 				</el-form-item>
                 <el-form-item label="车牌号" prop="drivercarnumber">
 					<el-input v-model="addForm.drivercarnumber"></el-input>
@@ -116,17 +110,17 @@
 			<el-form :model="editForm" ref="editFormRef" label-width="70px">
 
                 	<!--prop 验证规则  label-width指的是文本宽度-->
-				<el-form-item label="司机姓名" prop="drivername">
-					<el-input v-model="editForm.drivername" disabled></el-input>
+				<el-form-item label="司机id" prop="driverid">
+					<el-input v-model="editForm.driverid" disabled></el-input>
 				</el-form-item>
-				<el-form-item label="身份证号" prop="driveridnumber">
-					<el-input v-model="editForm.driveridnumber" disabled></el-input>
-				</el-form-item>
-				<el-form-item label="司机电话" prop="driverphone">
-					<el-input v-model="editForm.driverphone" disabled></el-input>
-				</el-form-item>
-				<el-form-item label="入/出园" prop="driverapplytype">
+				<el-form-item label="出/入园" prop="driverapplytype">
 					<el-input v-model="editForm.driverapplytype" disabled></el-input>
+				</el-form-item>
+				<el-form-item label="车类型" prop="drivercartype">
+					<el-input v-model="editForm.drivercartype" disabled></el-input>
+				</el-form-item>
+				<el-form-item label="车牌号" prop="drivercarnumber">
+					<el-input v-model="editForm.drivercarnumber" disabled></el-input>
 				</el-form-item>
 			
 				<!-- <el-form-item label="预约日期" prop="applydate">
@@ -219,7 +213,7 @@ export default {
       selectApplyType: "",
       //获取用户列表的参数
       queryInfo: {
-        id: "",
+        id: null,
         //当前页数
         pageNum: 1,
         //当前每页显示多少条
@@ -231,9 +225,10 @@ export default {
       addDialogVisible: false,
       //添加司机申请出/入园表单数据
       addForm: {
-        drivername: "",
-        driveridnumber: "",
-        driverphone: "",
+        // drivername: "",
+        // driveridnumber: "",
+        // driverphone: "",
+        driverid: "",
         driverapplytype: "",
         drivercartype: "",
         drivercarnumber: "",
@@ -245,7 +240,7 @@ export default {
       //添加司机申请出/入园表单规则
       addFormRules: {
         //对应prop
-        drivername: [
+        driverid: [
           {
             required: true,
             message: "请输入用户名称",
@@ -338,13 +333,10 @@ export default {
       editDialogVisible: false,
       //查询到的商品信息对象
       editForm: {
-        drivername: "",
-        driveridnumber: "",
-        driverphone: "",
+        driverid: "",
         driverapplytype: "",
         drivercartype: "",
         drivercarnumber: "",
-        driverapplystatus: "",
         applydate: "",
         applytime: "",
       },
@@ -356,7 +348,7 @@ export default {
   methods: {
     async getApplyList() {
       await this.$http
-        .post("/applyInfo/AllDriverInfoByManage", this.queryInfo, {
+        .post("/applyInfo/AllDriverApplyInfo", this.queryInfo, {
           headers: {
             "Content-Type": "application/json",
             token: localStorage.getItem("token"),
@@ -408,7 +400,7 @@ export default {
         if (!valid) return;
         //返回为true则向浏览器发送真正的添加商品的请求
         const { data: res } = await this.$http.post(
-          "/applyInfo/insertInfo",
+          "/applyInfo/insertDriverApplyInfo",
           this.addForm,
           {
             headers: {
@@ -417,10 +409,13 @@ export default {
             },
           }
         );
+        console.log("________________");
+        console.log(res);
         if (res.code != 200) {
-          this.$message.error("添加申请失败！");
+          this.$message.error(res.msg);
+        } else {
+          this.$message.success("添加申请成功！");
         }
-        this.$message.success("添加申请成功！");
         this.addDialogVisible = false;
         this.getApplyList();
       });
@@ -431,7 +426,7 @@ export default {
       console.log("获取用户id");
       console.log(id);
       await this.$http
-        .get("/applyInfo/infoByDriverInfoId/?id=" + id, {
+        .get("/applyInfo/selectApplyInfoById/?id=" + id, {
           headers: {
             "Content-Type": "application/json",
             token: localStorage.getItem("token"),
@@ -460,6 +455,12 @@ export default {
       console.log("确认审核申请信息");
       // this.editForm.driverapplystatus = 1;
       console.log(this.editForm);
+      console.log("修改前的日期");
+      const d = new Date(this.editForm.applydate);
+      const resDate =
+        d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
+      this.editForm.applydate = resDate;
+      console.log(this.editForm.applydate);
       //validate校验是否成功
       this.$refs.editFormRef.validate(async (valid) => {
         //				console.log(valid)
@@ -467,7 +468,7 @@ export default {
         if (!valid) return;
         //否则发起数据修改请求
         await this.$http
-          .patch("/applyInfo/updateDriverApplyInfo", this.editForm, {
+          .patch("/applyInfo/updateApplyInfo", this.editForm, {
             headers: {
               "Content-Type": "application/json",
               token: localStorage.getItem("token"),
@@ -475,6 +476,8 @@ export default {
           })
           .then((Response) => {
             const res = Response.data;
+            console.log("修改后的日期");
+            // console.log(res.applydate);
             console.log(res);
             if (res.code != 200) return this.$message.error(res.msg);
             //3.提示修改成功
@@ -495,7 +498,7 @@ export default {
     async removeGoodsById(applyInfo) {
       console.log(applyInfo);
       // console.log(id);
-      // applyInfo.applydate = applyInfo.applydate.substring(0, 10);
+
       // applyInfo.applydate = new Date(
       //   Date.parse(applyInfo.applydate).format("yyyy-MM-dd")
       // );
@@ -517,9 +520,10 @@ export default {
       //确认删除返回值为confirm，取消返回cancel
       console.log(confirmResult);
       if (confirmResult != "confirm") return this.$message.info("已取消删除");
-      applyInfo.driverapplystatus = -1;
+      applyInfo.driverapplystatus = "-1";
+      // applyInfo.applydate = applyInfo.applydate.substring(0, 10);
       const { data: res } = await this.$http.patch(
-        "/applyInfo/deleteDriverInfo",
+        "/applyInfo/deleteApplyInfoById",
         applyInfo,
         {
           headers: {

@@ -7,6 +7,7 @@ import applyInfo from '.././components/driverApply/applyInfo.vue'
 import orderInfo from '.././components/order/orderInfo.vue'
 import clientInfo from '.././components/client/clientInfo.vue'
 import test from '../components/test.vue'
+import driverInfo from '.././components/driverApply/driverInfo.vue'
 
 Vue.use(VueRouter)
 
@@ -50,6 +51,7 @@ const router = new VueRouter({
 				}
 			]
 		},
+
 		{
 			path: '/home',
 			component: home,
@@ -59,7 +61,18 @@ const router = new VueRouter({
 					component: clientInfo
 				}
 			]
-		}, {
+		},
+		{
+			path: '/home',
+			component: home,
+			children: [
+				{
+					path: '/driver',
+					component: driverInfo
+				}
+			]
+		},
+		{
 			path: '/test',
 			component: test
 		}

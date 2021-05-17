@@ -58,6 +58,7 @@
             </template>
             <el-menu-item-group>
               <el-menu-item index="/client">客户信息列表</el-menu-item>
+              <el-menu-item index="/driver">司机信息列表</el-menu-item>
               <!--默认商品分类的路径为'/3'-->
               <!-- <el-menu-item index="3">商品分类</el-menu-item> -->
               <!--<el-menu-item index="goods">商品分类</el-menu-item>-->

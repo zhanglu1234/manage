@@ -83,8 +83,8 @@
 				<el-form-item label="缴费时间" prop="orderpaymenttime">
 					<el-input v-model="editForm.orderpaymenttime" disabled></el-input>
 				</el-form-item>
-        	<el-form-item label="司机id" prop="orderdriverinfoid">
-					<el-input v-model="editForm.orderdriverinfoid" disabled></el-input>
+        	<el-form-item label="申请信息" prop="orderapplyinfoid">
+					<el-input v-model="editForm.orderapplyinfoid" disabled></el-input>
 				</el-form-item>
 				<el-form-item label="客户id" prop="orderclientid">
 					<el-input v-model="editForm.orderclientid"></el-input>
@@ -187,7 +187,7 @@ export default {
         orderpaymenttime: "",
         drivercarnumber: "",
         orderclientid: "",
-        orderdriverinfoid: "",
+        orderapplyinfoid: "",
         ordernumber: "",
         createby: "auto",
       },
