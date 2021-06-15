@@ -5,9 +5,7 @@
 			<el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
 			<el-breadcrumb-item :to="{ path: '/order' }">订单列表</a>
 			</el-breadcrumb-item>
-		
 		</el-breadcrumb>
-
 		<!--卡片视图区-->
 		<el-card>
 			<!--搜索与添加窗口-->
@@ -42,7 +40,9 @@
 				<el-table-column label="客户账号" prop="clientuniqueid"></el-table-column>
 				<el-table-column label="司机姓名" prop="drivername"></el-table-column>
         <el-table-column label="订单状态" prop="orderstatus"></el-table-column>
-        <el-table-column label="预约日期" prop="applydate"></el-table-column>
+        <el-table-column label="是否入园" prop="driverapplytype"></el-table-column>
+        <el-table-column label="预约日期" prop="applydate">         
+        </el-table-column>
 				<el-table-column label="操作">
 					<!--slot-scope作用域插槽拿到scope对象-->
 					<template slot-scope="scope">
@@ -107,7 +107,8 @@ export default {
   data() {
     //验证是否为数字
     var checkPhoneNumber = (rule, value, callback) => {
-      const regNumber = /^1([38][0-9]|4[579]|5[0-3,5-9]|6[6]|7[0135678]|9[89])\d{8}$/;
+      const regNumber =
+        /^1([38][0-9]|4[579]|5[0-3,5-9]|6[6]|7[0135678]|9[89])\d{8}$/;
       if (regNumber.test(value)) {
         return callback();
       }
@@ -150,7 +151,8 @@ export default {
     十五，十六，十七都是数字0-9
     十八位可能是数字0-9，也可能是X
     */
-      var idcard_patter = /^[1-9][0-9]{5}([1][9][0-9]{2}|[2][0][0|1][0-9])([0][1-9]|[1][0|1|2])([0][1-9]|[1|2][0-9]|[3][0|1])[0-9]{3}([0-9]|[X])$/;
+      var idcard_patter =
+        /^[1-9][0-9]{5}([1][9][0-9]{2}|[2][0][0|1][0-9])([0][1-9]|[1][0|1|2])([0][1-9]|[1|2][0-9]|[3][0|1])[0-9]{3}([0-9]|[X])$/;
       if (idcard_patter.test(value) && (last === last_no ? true : false)) {
         return callback();
       }
@@ -168,6 +170,24 @@ export default {
     return {
       orderstatus: "",
       //获取用户列表的参数
+      applytime: [
+        { contentInfo: "6:00-9:00", value: "1" },
+        { contentInfo: "9:00-12:00", value: "2" },
+        { contentInfo: "12:00-15:00", value: "3" },
+        { contentInfo: "15:00-18:00", value: "4" },
+      ],
+      orderpaymentstatus: [
+        { contentInfo: "未缴费", value: "0" },
+        { contentInfo: "未缴费", value: "1" },
+      ],
+      driverapplytype: [
+        { contentInfo: "出园", value: "1" },
+        { contentInfo: "入园", value: "2" },
+      ],
+      orderstatus: [
+        { contentInfo: "有效", value: "1" },
+        { contentInfo: "无效", value: "-1" },
+      ],
       queryInfo: {
         id: "",
         //当前页数
@@ -190,6 +210,7 @@ export default {
         orderapplyinfoid: "",
         ordernumber: "",
         createby: "auto",
+        orderpayment: "",
       },
     };
   },
@@ -215,7 +236,23 @@ export default {
           }
           this.orderList = res.data.list;
           for (var i = 0; i < this.orderList.length; i++) {
+            // 预约时间
+            this.orderList[i].applytime = this.applytime.find(
+              (a) => a.value == this.orderList[i].applytime
+            ).contentInfo;
             this.orderList[i].applydate += " " + this.orderList[i].applytime;
+            // 出/入园
+            this.orderList[i].driverapplytype = this.driverapplytype.find(
+              (a) => a.value == this.orderList[i].driverapplytype
+            ).contentInfo;
+            // 是否缴费
+            this.orderList[i].orderpaymentstatus = this.orderpaymentstatus.find(
+              (a) => a.value == this.orderList[i].orderpaymentstatus
+            ).contentInfo;
+            // 订单是否有效
+            this.orderList[i].orderstatus = this.orderstatus.find(
+              (a) => a.value == this.orderList[i].orderstatus
+            ).contentInfo;
           }
           console.log(this.getOrderList);
           this.total = res.data.total;
@@ -264,6 +301,11 @@ export default {
           }
           console.log(res.data);
           this.editForm = res.data;
+          console.log("hahah");
+          console.log(this.editForm);
+          this.editForm.orderpaymentstatus = this.orderpaymentstatus.find(
+            (a) => a.value == this.editForm.orderpaymentstatus
+          ).contentInfo;
 
           this.editDialogVisible = true;
         })

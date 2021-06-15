@@ -19,7 +19,7 @@
 					</el-input>
 				</el-col>
 				<el-col :span="4">
-					<el-button type="primary" @click="addDialogVisible = true">添加司机信息</el-button>
+					<!-- <el-button type="primary" @click="addDialogVisible = true">添加司机信息</el-button> -->
 				</el-col>
 			</el-row>
 			<!--用户列表区域-->
@@ -321,7 +321,7 @@ export default {
         if (!valid) return;
         //否则发起数据修改请求
         await this.$http
-          .patch("/clientInfo/updateClientInfo", this.editForm, {
+          .patch("/driverInfo/updateDriverInfo", this.editForm, {
             headers: {
               "Content-Type": "application/json",
               token: localStorage.getItem("token"),
@@ -363,7 +363,7 @@ export default {
       console.log(confirmResult);
       if (confirmResult != "confirm") return this.$message.info("已取消删除");
       const { data: res } = await this.$http.delete(
-        "/clientInfo/deleteClientInfo?id=" + id,
+        "/driverInfo/deleteClientInfo?id=" + id,
         {
           headers: {
             "Content-Type": "application/json",

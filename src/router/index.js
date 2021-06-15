@@ -8,6 +8,8 @@ import orderInfo from '.././components/order/orderInfo.vue'
 import clientInfo from '.././components/client/clientInfo.vue'
 import test from '../components/test.vue'
 import driverInfo from '.././components/driverApply/driverInfo.vue'
+import charts from '.././components/charts/charts.vue'
+import new12 from '../components/new12.vue'
 
 Vue.use(VueRouter)
 
@@ -75,6 +77,27 @@ const router = new VueRouter({
 		{
 			path: '/test',
 			component: test
+		},
+
+		{
+			path: '/home',
+			component: home,
+			children: [
+				{
+					path: '/charts',
+					component: charts
+				}
+			]
+		},
+		{
+			path: '/home',
+			component: home,
+			children: [
+				{
+					path: '/new12',
+					component: new12
+				}
+			]
 		}
 	]
 })
